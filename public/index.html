@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html ng-app="myApp" ng-controller="mainCTRL">
+
+	<head>
+		<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.15/angular.min.js"></script>
+
+		<link rel="stylesheet" type="text/css" href="my.css" media="screen" />
+		<link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+	</head>
+	<body>
+
+	<h1>GIT Nightwatcher ready</h1>
+	<h1>{{repoList[0] | organizationname}} </h1>
+	<p><a href="/panel">Big Panel</a></p>
+
+<section class="repos">
+	<h2>List of Repositories </h2>
+		<ul>
+			<li   ng-repeat="repo in repoList" ng-click="loadCommits(repo)">{{repo | reponame}}	</li>
+		</ul>
+</section>
+	
+<section class="commits">	
+	<h2 class="txtcenter"> {{repo}}</h2>
+		<ul >
+			<li ng-repeat="commit in commitsList" >
+					<ul class="commit">
+
+						<li class="fleft fhalf"><i class="fa fa-clock-o"></i> {{commit.date | time}}</li>
+						<li class="fright fhalf"><i class="fa fa-user"></i> {{commit.commiter}}</li>
+						<li class="fleft fhalf"><i class="fa fa-key"></i> {{commit.sha}}</li>
+						<li class="fleft ffull top10">{{commit.sms}}</li>
+						<li class="fright fhalf"><span class="circle">{{$index+1}}</span></li>
+						
+					</ul>
+			</li>
+		</ul>
+</section>
+
+	</body>
+
+	<script>
+
+	var myApp = angular.module('myApp',["filters"]);
+
+	myApp.controller('mainCTRL', ['$scope','$http', function($scope,$http) {
+	  $scope.hola = 'Hola!';
+
+			//REPOLIST
+			$http({method: 'GET', url: '/repoList'}).
+			    success(function(data, status, headers, config) {
+
+			      $scope.repoList=data;
+			    }).
+			    error(function(data, status, headers, config) {
+			      console.log(data);
+			    });
+
+			//Load  commits on demand
+		    $scope.loadCommits=function(repo){
+
+			    $http({method: 'GET', url: '/commits?repo='+repo}).
+				    success(function(data, status, headers, config) {
+				    	$scope.repo=repo;
+				      	$scope.commitsList=data;
+				    }).
+				    error(function(data, status, headers, config) {
+				      console.log(data);
+				    });
+
+
+		    }
+
+	}]);
+
+	angular.module('filters', [])
+		.filter('time', [function () {
+		    return function (time) { 
+		         
+		      return time.replace("T", " @ ");
+		    };
+		}])
+		.filter('reponame', [function () {
+		    return function (name) { 
+		          var cut=name.indexOf("/");
+		      return name.substring(cut+1, name.length);
+		    };
+		}])
+		.filter('organizationname', [function () {
+		    return function (name) { 
+		          var cut=name.indexOf("/");
+		      return name.substring(0, cut);
+		    };
+		}]);
+
+	</script>
+</html>

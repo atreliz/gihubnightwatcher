@@ -1,0 +1,82 @@
+/*RESET*/
+ul, menu, dir {
+	display: block;
+	list-style-type: disc;
+	-webkit-margin-before: 0em;
+	-webkit-margin-after: 0em;
+	-webkit-margin-start: 0px;
+	-webkit-margin-end: 0px;
+	-webkit-padding-start: 0px;
+}
+
+
+/*CSS*/
+section{
+	display: block;
+	float:left;
+}
+
+.selected{background: black; color white;}
+.txtcenter{text-align: center;}
+.fleft{float:left; width:auto; text-align: left;}
+.fright{float:right; width:auto; text-align: right;}
+.ffull{width:100%;}
+.fhalf{width:50%;}
+.top10{margin-top: 10px;}
+.circle{ 
+	border-radius: 10px;
+	padding: 1px 5px;
+	display: inline;
+	width: auto;
+	border: 1px solid rgb(0, 0, 0);
+}
+
+.repos {
+	display:block;
+	float:left;
+	width:20%;
+	margin-right: 1%;
+	margin-left: 1%;
+}
+
+.commits{
+	display: block;
+	float:left;
+	width:77%;
+	margin-right: 1%;
+}
+
+.repos h2{text-align: center;}
+.repos ul li{
+	background: grey;
+	border-radius: 2px;
+	padding: 5px 10px;
+	margin-bottom: 5px;
+	text-align: center;
+	font-weight: bold;
+	color:white;
+
+	font-size: 1.1em;
+	box-shadow: 0px 1px 1px black;
+}
+
+body{
+	background: #bbb;
+	color:black;
+	font-family: arial;
+}
+
+
+.commit{
+	display: block;
+	border-radius: 5px;
+	padding:5px;
+	background: white;
+	float: left;
+	width: 100%;
+	margin-bottom: 10px;
+}
+
+ul li {
+    list-style-type: none;
+}

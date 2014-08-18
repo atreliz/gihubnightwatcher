@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html ng-app="myApp" ng-controller="mainCTRL">
+
+	<head>
+		<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.15/angular.min.js"></script>
+		<script src="/zepto.min.js"></script>
+
+		<!--<link rel="stylesheet" type="text/css" href="my.css" media="screen" />-->
+		<link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+		<style>
+		body{margin:1%; background: rgb(187, 187, 187);}
+
+
+			.selected{background: black; color white;}
+			.txtcenter{text-align: center;}
+			.fleft{float:left; width:auto; text-align: left;}
+			.fright{float:right; width:auto; text-align: right;}
+			.ffull{width:100%;}
+			.fhalf{width:50%;}
+			.top10{margin-top: 10px;}
+			.circle{ 
+				border-radius: 10px;
+				padding: 1px 5px;
+				display: inline;
+				width: auto;
+				border: 1px solid rgb(0, 0, 0);
+			}
+
+
+			ul, menu, dir {
+				display: block;
+				list-style-type: disc;
+				-webkit-margin-before: 0em;
+				-webkit-margin-after: 0em;
+				-webkit-margin-start: 0px;
+				-webkit-margin-end: 0px;
+				-webkit-padding-start: 0px;
+			}
+			section{float:left;width:100%;}
+			.repos ul{
+				float:left; 
+				box-shadow:0px 0px 3px black;
+				width:24%;
+				margin-right: 1%;
+				border-radius: 5px 5px 0px 0px;
+			}
+			.repos  .commit{
+				float:left; width:96%;margin:1%; padding:1%;
+				background: white;
+				border-radius: 5px;
+			}
+			.repo{margin-bottom: 50px;}
+			
+			ul li {    list-style-type: none;}
+		</style>
+	</head>
+	<body>
+
+	<h1>GIT Nightwatcher ready</h1>
+	<h1>PANEL {{repoList[0].name | organizationname}}</h1>
+	<p><a href="/panel">Back to selector</a></p>
+
+<section class="repos">
+	<h2 class="txtcenter">List of Repositories </h2>
+	<!--{{repoList |json}}-->
+		<ul class="repo" ng-repeat="repo in repoList">
+			<h3 class="txtcenter"> {{repo.name | reponame}}	</h3>
+
+				<li ng-repeat="commit in repo.commits" >
+					<!--{{commit}}-->
+					<ul class="commit">
+
+						<li class="fleft "><i class="fa fa-clock-o"></i> {{commit.date | time}}</li>
+						<li class="fright "><i class="fa fa-user"></i> {{commit.commiter}}</li>
+						<li class="fleft "><i class="fa fa-key"></i> {{commit.sha}}</li>
+						<li class="fleft ffull top10">{{commit.sms}}</li>
+						<li class="fright fhalf"><span class="circle">{{$index+1}}</span></li>
+						
+					</ul>
+				</li>
+
+		</ul>
+		
+</section>
+	
+
+
+	</body>
+
+	<script>
+
+	function sameheight(){
+		var allHeights=[];
+		$('.repo').each(function(index){
+			allHeights.push($(this).height());
+		  console.log('input %d is: %o', index, this)
+		});
+		var MaxH=Math.max.apply(Math, allHeights);
+		console.log(allHeights);
+		console.log(MaxH);
+
+
+		setTimeout(function(){
+			$('.repo').height(MaxH);
+		}, 3000);
+		
+	}
+
+	var myApp = angular.module('myApp',["filters"]);
+
+	myApp.controller('mainCTRL', ['$scope','$http','$timeout', function($scope,$http,$timeout) {
+	  $scope.hola = 'Hola!';
+
+	  		//Load  commits on demand
+		    $scope.loadCommits=function(repo,pos){
+
+			    $http({method: 'GET', url: '/commits?repo='+repo}).
+				    success(function(data, status, headers, config) {
+				    	console.log(data);
+				    	$scope.repoList[pos].commits=data;
+				    		//$scope.repo=repo;
+				      		//$scope.commitsList=data;
+				      		sameheight();
+				    	
+				    	
+				    }).
+				    error(function(data, status, headers, config) {
+				      console.log("ERROR");
+				    });
+		    };
+
+
+			//REPOLIST
+			$http({method: 'GET', url: '/repoList'}).
+			    success(function(data, status, headers, config) {
+
+			      //$scope.repoList=data;
+			      console.log(data);
+			      //array to JSON
+			      var repoArray=[];
+			      for(var i=0;i<data.length-1;i++){
+			      	repoArray.push({"name":data[i]});
+			      	
+				      	//$timeout(function(){
+				      		//console.log( data[i] );
+				      		$scope.loadCommits(data[i],i);
+				      	//}, 1000);
+			      	
+			      }
+			      $scope.repoList=repoArray;
+			      console.log($scope.repoList);
+
+			    }).
+			    error(function(data, status, headers, config) {
+			      console.log(data);
+			    });
+
+			
+
+	}]);
+
+	angular.module('filters', [])
+		.filter('time', [function () {
+		    return function (time) { 
+		         
+		      return time.replace("T", " @ ");
+		    };
+		}])
+		.filter('reponame', [function () {
+		    return function (name) { 
+		          var cut=name.indexOf("/");
+		      return name.substring(cut+1, name.length);
+		    };
+		}])
+		.filter('organizationname', [function () {
+		    return function (name) { 
+		          var cut=name.indexOf("/");
+		      return name.substring(0, cut);
+		    };
+		}]);
+
+	</script>
+</html>
